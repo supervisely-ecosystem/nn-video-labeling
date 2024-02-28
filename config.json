@@ -1,0 +1,17 @@
+{
+  "type": "app",
+  "version": "2.0.0",
+  "name": "Video Labeling Tool",
+  "description": "Apply NN models to video frames",
+  "docker_image": "supervisely/labeling:latest",
+  "instance_version": "6.8.73",
+  "categories": ["videos", "labeling"],
+  "task_location": "application_sessions",
+  "icon": "",
+  "icon_cover": true,
+  "headless": false,
+  "poster": "",
+  "entrypoint": "python -m uvicorn src.main:app --host 0.0.0.0 --port 8000",
+  "integrated_into": ["video_annotation_tool"],
+  "port": 8000
+}
