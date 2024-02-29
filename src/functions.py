@@ -102,28 +102,22 @@ def inference(
         g.project_metas[g.project_id] = project_meta
 
         video_objects = []
-        # figures = []
-        key_id_map = sly.KeyIdMap()
         for label in ann.labels:
             obj_class = project_meta.get_obj_class(label.obj_class.name)
             video_object = sly.VideoObject(obj_class, sly.VideoTagCollection())
             video_objects.append(video_object)
-            # figures.append(sly.VideoFigure(video_object, label.geometry, frame_id))
         ids = api.video.object.append_bulk(video_id, video_objects, sly.KeyIdMap())
 
-        tags = {}
-        for label, obj_id in zip(ann.labels, ids, video_objects):
-            label: sly.Label
-            key_id_map.add_object(video_object.key, obj_id)
+        for label, obj_id in zip(ann.labels, ids):
             geometry_json = label.geometry.to_json()
             geometry_type = label.geometry.geometry_name()
-            fig_id = api.video.figure.create(video_id, obj_id, frame_id, geometry_json, geometry_type)
-            if obj_id not in tags:
-                tags[obj_id] = label.tags
-            # TODO: use uuid4().hex
-        for video_object_id, video_object_tags in tags.items():
-            api.video.tag.append_to_objects(video_object_id, g.project_id, video_object_tags)
-        # api.video.tag.append_to_objects(video_id, frame_id, tags, sly.KeyIdMap())
+            fig_id = api.video.figure.create(
+                video_id, obj_id, frame_id, geometry_json, geometry_type
+            )
+            for tag in label.tags:
+                tag_meta = project_meta.get_tag_meta(tag.meta.name)
+                api.advanced.add_tag_to_object(tag_meta.sly_id, fig_id, tag.value)
+        # Will not work for video
         # if t == g.timestamp:
         #     api.annotation.update_label(label_id, label)
 
