@@ -4,7 +4,7 @@ from fastapi import Request
 from supervisely.app.widgets import Button, Container
 
 import src.globals as g
-from src.ui import apply_button, inference, ui_content
+from src.ui import apply_button, apply_button_clicked, ui_content
 
 layout = Container(widgets=[ui_content])
 app = sly.Application(layout=layout)
@@ -24,7 +24,6 @@ def video_changed(event_api: sly.Api, event: sly.Event.ManualSelected.VideoChang
     g.api = event_api
     g.team_id = event.team_id
     g.session_id = event.session_id
-    g.dataset_id = event.dataset_id
     g.video_id = event.video_id
     g.project_id = event.project_id
     g.frame = event.frame
@@ -32,15 +31,6 @@ def video_changed(event_api: sly.Api, event: sly.Event.ManualSelected.VideoChang
     if event.project_id not in g.project_metas:
         project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(event.project_id))
         g.project_metas[event.project_id] = project_meta
-
-    # Using a simple caching mechanism to avoid downloading the project meta every time.
-    # is it necessary to download the annotations?
-    # if event.video_id not in g.annotations:
-    #     ann_json = g.api.video.annotation.download(g.video_id)
-    #     ann_path = os.path.join(sly.app.get_data_dir(), f"{g.video_id}_ann.json")
-    #     sly.fs.silent_remove(ann_path)
-    #     sly.json.dump_json_file(ann_json, ann_path)
-    #     g.annotations[event.video_id] = ann_path
 
 
 apply_button._click_handled = True
@@ -52,16 +42,15 @@ def apply_button_click(request: Request):
     state = request.get("state")
     if state:
         context = state.get("context")
-        frame_index = context.get("frame")
-        project_id = context.get("projectId")
-        video_id = context.get("entityId")
-        if project_id is not None:
-            g.project_id = project_id
-            if project_id not in g.project_metas:
-                project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(project_id))
-                g.project_metas[project_id] = project_meta
-        if video_id is not None:
-            g.video_id = video_id
-        if frame_index is not None:
-            g.frame = frame_index
-            inference()
+        frame = context.get("frame")
+        g.project_id = context.get("projectId", g.project_id)
+        g.video_id = context.get("entityId", g.video_id)
+        g.session_id = context.get("sessionId", g.session_id)
+
+        if g.project_id:
+            if g.project_id not in g.project_metas:
+                project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(g.project_id))
+                g.project_metas[g.project_id] = project_meta
+        if frame:
+            g.frame = frame
+            apply_button_clicked()

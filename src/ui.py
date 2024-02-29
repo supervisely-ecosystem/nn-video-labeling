@@ -137,16 +137,16 @@ def disconnect_button_click():
 
 
 # @apply_button.click
-def inference():
+def apply_button_clicked():
     """Applies the model to the selected image."""
 
     apply_button.loading = True
     disconnect_button.disable()
 
-    keep_classes = select_classes.get_selected_classes()
-    keep_tags = select_tags.get_selected_tags()
-    suffix = suffix_input.get_value()
-    use_suffix = suffix_checkbox.is_checked()
+    g.selected_classes = select_classes.get_selected_classes()
+    g.selected_tags = select_tags.get_selected_tags()
+    g.suffix = suffix_input.get_value()
+    g.use_suffix = suffix_checkbox.is_checked()
 
     try:
         inf_settings = yaml.safe_load(inference_settings.get_value())
@@ -158,7 +158,7 @@ def inference():
             exc_info=True,
         )
     g.session.set_inference_settings(inf_settings)
-    f.inference(g.api, g.video_id, g.frame, keep_classes, keep_tags, suffix, use_suffix)
+    f.inference()
     disconnect_button.enable()
     apply_button.loading = False
     print("Inference done.")

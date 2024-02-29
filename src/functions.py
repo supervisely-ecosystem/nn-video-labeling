@@ -1,10 +1,8 @@
-from datetime import datetime
 from typing import Dict, Literal, Tuple, Union
 
 import supervisely as sly
 import yaml
 
-import src.functions as f
 import src.globals as g
 
 
@@ -71,26 +69,18 @@ def load_tags(model_meta) -> sly.TagMetaCollection:
     return obj_tags
 
 
-def inference(
-    api: sly.Api,
-    video_id: int,
-    frame_id: int,
-    keep_classes: sly.ObjClassCollection,
-    keep_tags: sly.TagMetaCollection,
-    suffix: str,
-    use_suffix: bool,
-):
+def inference():
     """Applies the model to the selected frame."""
     project_meta = g.project_metas[g.project_id]
 
-    api.vid_ann_tool.disable_job_controls(g.session_id)
+    g.api.vid_ann_tool.disable_job_controls(g.session_id)
     predictions_list = g.session.inference_video_id(
-        video_id, start_frame_index=frame_id, frames_count=1, frames_direction="forward"
+        g.video_id, start_frame_index=g.frame, frames_count=1, frames_direction="forward"
     )
     if len(predictions_list) == 1:
         ann = predictions_list[0]
         ann, res_project_meta = postprocess(
-            ann, project_meta, keep_classes, keep_tags, suffix, use_suffix
+            ann, project_meta, g.selected_classes, g.selected_tags, g.suffix, g.use_suffix
         )
         if project_meta != res_project_meta:
             project_meta = res_project_meta
@@ -103,19 +93,19 @@ def inference(
             obj_class = project_meta.get_obj_class(label.obj_class.name)
             video_object = sly.VideoObject(obj_class, sly.VideoTagCollection())
             video_objects.append(video_object)
-        ids = api.video.object.append_bulk(video_id, video_objects, sly.KeyIdMap())
+        ids = g.api.video.object.append_bulk(g.video_id, video_objects, sly.KeyIdMap())
 
         for label, obj_id in zip(ann.labels, ids):
             geometry_json = label.geometry.to_json()
             geometry_type = label.geometry.geometry_name()
-            fig_id = api.video.figure.create(
-                video_id, obj_id, frame_id, geometry_json, geometry_type
+            fig_id = g.api.video.figure.create(
+                g.video_id, obj_id, g.frame, geometry_json, geometry_type
             )
             for tag in label.tags:
                 tag_meta = project_meta.get_tag_meta(tag.meta.name)
-                api.advanced.add_tag_to_object(tag_meta.sly_id, fig_id, tag.value)
+                g.api.advanced.add_tag_to_object(tag_meta.sly_id, fig_id, tag.value)
 
-    api.vid_ann_tool.enable_job_controls(g.session_id)
+    g.api.vid_ann_tool.enable_job_controls(g.session_id)
 
 
 def postprocess(
