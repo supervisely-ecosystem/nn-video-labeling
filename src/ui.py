@@ -150,7 +150,7 @@ def inference():
 
     try:
         inf_settings = yaml.safe_load(inference_settings.get_value())
-        sly.logger.info(f"Final Inference Settings: {inf_settings}")
+        print(f"Inference Settings: {inf_settings}")
     except Exception as e:
         inf_settings = yaml.safe_load(g.inference_settings)
         sly.logger.warning(
@@ -161,3 +161,4 @@ def inference():
     f.inference(g.api, g.video_id, g.frame, keep_classes, keep_tags, suffix, use_suffix)
     disconnect_button.enable()
     apply_button.loading = False
+    print("Inference done.")

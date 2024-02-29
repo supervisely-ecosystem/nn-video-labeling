@@ -53,6 +53,15 @@ def apply_button_click(request: Request):
     if state:
         context = state.get("context")
         frame_index = context.get("frame")
+        project_id = context.get("projectId")
+        video_id = context.get("entityId")
+        if project_id is not None:
+            g.project_id = project_id
+            if project_id not in g.project_metas:
+                project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(project_id))
+                g.project_metas[project_id] = project_meta
+        if video_id is not None:
+            g.video_id = video_id
         if frame_index is not None:
             g.frame = frame_index
             inference()

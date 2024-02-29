@@ -81,9 +81,6 @@ def inference(
     use_suffix: bool,
 ):
     """Applies the model to the selected frame."""
-    if not g.project_id:
-        return
-
     project_meta = g.project_metas[g.project_id]
 
     api.vid_ann_tool.disable_job_controls(g.session_id)
