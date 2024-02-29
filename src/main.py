@@ -62,22 +62,3 @@ def video_changed(event_api: sly.Api, event: sly.Event.ManualSelected.VideoChang
 #     if event.project_id not in g.project_metas:
 #         project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(event.project_id))
 #         g.project_metas[event.project_id] = project_meta
-
-# WILL NOT WORK FOR VIDEO, nned roi implementation in SDK
-# @app.event(sly.Event.ManualSelected.FigureChanged)
-# def figure_changed(event_api: sly.Api, event: sly.Event.ManualSelected.FigureChanged):
-#     sly.logger.info("figure_changed")
-#     if event.figure_id is None:
-#         return
-#     # Saving the event parameters to global variables.
-#     g.api = event_api
-#     g.team_id = event.team_id
-#     g.session_id = event.session_id
-#     g.dataset_id = event.dataset_id
-#     g.video_id = event.video_id
-#     g.project_id = event.project_id
-#     g.frame = event.frame
-#     g.figure_id = event.figure_id
-#     g.object_id = event.object_id
-#     g.figure_class_id = event.figure_class_id
-#     g.figure_class_name = event.figure_class_name
