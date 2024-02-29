@@ -83,6 +83,7 @@ def connect_button_click():
 
     g.session = sly.nn.inference.Session(g.api, task_id=g.model_session_id)
     session_info = g.session.get_session_info()
+    g.task_type = session_info.get("task type")
 
     if not session_info:
         error_text.text = (
@@ -91,7 +92,6 @@ def connect_button_click():
         error_text.show()
         return
 
-    error_text.hide()
     model_info.set_model_info(g.model_session_id, session_info)
 
     # Get the model meta.
@@ -111,6 +111,7 @@ def connect_button_click():
 
     select_session.hide()
     connect_button.hide()
+    error_text.hide()
     connect_button.loading = False
     tabs.show()
     disconnect_button.show()
@@ -140,13 +141,30 @@ def disconnect_button_click():
 def apply_button_clicked():
     """Applies the model to the selected image."""
 
+    error_text.hide()
     apply_button.loading = True
     disconnect_button.disable()
+    selected_classes = select_classes.get_selected_classes()
+    selected_tags = select_tags.get_selected_tags()
+    suffix = suffix_input.get_value()
+    use_suffix = suffix_checkbox.is_checked()
 
-    g.selected_classes = select_classes.get_selected_classes()
-    g.selected_tags = select_tags.get_selected_tags()
-    g.suffix = suffix_input.get_value()
-    g.use_suffix = suffix_checkbox.is_checked()
+
+    new_session = sly.nn.inference.Session(g.api, task_id=g.model_session_id)
+    new_session_info = new_session.get_session_info()
+    if g.task_type != new_session_info.get("task type"):
+        error_text.text = "Model task type has been changed. Reconnecting..."
+        error_text.show()
+        connect_button_click()
+        select_classes.select([obj_class.name for obj_class in selected_classes])
+        select_tags.select([tag.name for tag in selected_tags])
+        suffix_input.set_value(suffix)
+        suffix_checkbox.check() if use_suffix else suffix_checkbox.uncheck()
+
+    g.selected_classes = selected_classes
+    g.selected_tags = selected_tags
+    g.suffix = suffix
+    g.use_suffix = use_suffix
 
     try:
         inf_settings = yaml.safe_load(inference_settings.get_value())
@@ -160,8 +178,10 @@ def apply_button_clicked():
     g.session.set_inference_settings(inf_settings)
     try:
         f.inference()
+        print("Inference done.")
     except Exception as e:
         sly.logger.warning("Model Inference failed", exc_info=True)
+        error_text.text = f"Model Inference failed: {repr(e)}"
+        error_text.show()
     disconnect_button.enable()
     apply_button.loading = False
-    print("Inference done.")

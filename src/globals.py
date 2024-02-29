@@ -17,6 +17,7 @@ project_id = None
 frame = None
 
 session = None
+task_type = None
 model_session_id = None
 model_meta = None
 inference_settings = None
