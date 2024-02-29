@@ -158,7 +158,10 @@ def apply_button_clicked():
             exc_info=True,
         )
     g.session.set_inference_settings(inf_settings)
-    f.inference()
+    try:
+        f.inference()
+    except Exception as e:
+        sly.logger.warning("Model Inference failed", exc_info=True)
     disconnect_button.enable()
     apply_button.loading = False
     print("Inference done.")
