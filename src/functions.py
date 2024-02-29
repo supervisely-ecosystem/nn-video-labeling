@@ -81,8 +81,8 @@ def inference(
     use_suffix: bool,
 ):
     """Applies the model to the selected frame."""
-    t = datetime.now().timestamp()
-    g.timestamp = t
+    if not g.project_id:
+        return
 
     project_meta = g.project_metas[g.project_id]
 
@@ -117,9 +117,6 @@ def inference(
             for tag in label.tags:
                 tag_meta = project_meta.get_tag_meta(tag.meta.name)
                 api.advanced.add_tag_to_object(tag_meta.sly_id, fig_id, tag.value)
-        # Will not work for video
-        # if t == g.timestamp:
-        #     api.annotation.update_label(label_id, label)
 
     api.vid_ann_tool.enable_job_controls(g.session_id)
 

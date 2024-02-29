@@ -67,7 +67,7 @@ tabs = w.Tabs(
 )
 tabs.hide()
 
-container = w.Container([connect_field, error_text, tabs])
+ui_content = w.Container([connect_field, error_text, tabs])
 
 
 @connect_button.click
@@ -136,7 +136,7 @@ def disconnect_button_click():
     select_session.show()
 
 
-@apply_button.click
+# @apply_button.click
 def inference():
     """Applies the model to the selected image."""
 
