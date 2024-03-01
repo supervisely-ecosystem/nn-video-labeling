@@ -40,8 +40,6 @@ The application supports the following models:
 
 ### Object Detection:
 
-- [Serve YOLOv5](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/yolov5/supervisely/serve)  
-   <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/yolov5/supervisely/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/yoloV8.png" width="350px"/>
 - [Serve YOLOv8](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/yolov8/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/yolov8/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/yoloV8.png" width="350px"/>
 - [Serve MMDetection 3.0](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/serve-mmdetection-v3)  
