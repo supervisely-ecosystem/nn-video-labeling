@@ -51,6 +51,6 @@ def apply_button_click(request: Request):
             if g.project_id not in g.project_metas:
                 project_meta = sly.ProjectMeta.from_json(g.api.project.get_meta(g.project_id))
                 g.project_metas[g.project_id] = project_meta
-        if frame:
+        if frame is not None:
             g.frame = frame
             apply_button_clicked()
