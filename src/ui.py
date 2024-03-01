@@ -28,6 +28,7 @@ connect_field = w.Field(
         [model_box, buttons_box],
         direction="horizontal",
         style="margin-top: 10px",
+        overflow=None
     ),
     title="Connect to running model",
     description="Define session (task id) with deployed model and connect to it.",
@@ -148,7 +149,6 @@ def apply_button_clicked():
     selected_tags = select_tags.get_selected_tags()
     suffix = suffix_input.get_value()
     use_suffix = suffix_checkbox.is_checked()
-
 
     new_session = sly.nn.inference.Session(g.api, task_id=g.model_session_id)
     new_session_info = new_session.get_session_info()
