@@ -1,6 +1,6 @@
 <div align="center" markdown>
 
-<img src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/poster1.png"/>
+<img src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.2/poster1.png"/>
 
 # Apply NN to Video Frames
 
