@@ -4,14 +4,6 @@
 
 # Apply NN to Video Frames
 
-<p align="center">
-  <a href="#Overview">Overview</a> •
-  <a href="#Demo">Demo</a> •
-  <a href="#Related-Apps">Related Apps</a> •
-  <a href="#How-To-Run">How To Run</a> •
-    <a href="#Screenshot">Screenshot</a>
-</p>
-
 [![](https://img.shields.io/badge/supervisely-ecosystem-brightgreen)](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/nn-video-labeling/annotation-tool)
 [![](https://img.shields.io/badge/slack-chat-green.svg?logo=slack)](https://supervise.ly/slack)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/supervisely-ecosystem/nn-video-labeling)
@@ -54,7 +46,6 @@ The application supports the following models:
 - [Serve MMDetection 3.0](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/serve-mmdetection-v3)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/serve-mmdetection-v3" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmDet3.png" width="350px"/>
 
-
 # How to Run
 
 1. Launch Serve APP, designed for Videos Projects
@@ -66,7 +57,5 @@ The application supports the following models:
 <img src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/runnn.png" width="80%" style='padding-top: 10px'>
 
 3. Set the settings and apply NN to the current video frame
-
-# Screenshot
 
 <img src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/applynn.png" width="80%" style='padding-top: 10px'>
