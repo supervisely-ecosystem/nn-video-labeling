@@ -5,7 +5,15 @@
   "description": "Apply NN models to video frames",
   "docker_image": "supervisely/labeling:6.73.45",
   "instance_version": "6.8.88",
-  "categories": ["videos", "labeling"],
+  "categories": [
+    "neural network",
+    "videos",
+    "labeling",
+    "object detection",
+    "semantic segmentation",
+    "instance segmentation",
+    "inference interfaces"
+  ],
   "task_location": "application_sessions",
   "icon": "",
   "icon_cover": true,
