@@ -46,6 +46,15 @@ The application supports the following models:
 - [Serve MMDetection 3.0](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/serve-mmdetection-v3)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/serve-mmdetection-v3" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmDet3.png" width="350px"/>
 
+### Semantic Segmentation:
+
+- [Serve MMSegmentation](https://ecosystem.supervisely.com/apps/mmsegmentation/serve)  
+   <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmsegmentation/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmSeg.png" width="350px"/>
+- [Serve HRDA](https://ecosystem.supervise.ly/apps/hrda/sly_app_serve)  
+   <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/hrda/sly_app_serve" src="https://github.com/supervisely-ecosystem/hrda/assets/119248312/330f13e9-bc84-45ce-a9a3-d56fafec9c97" width="350px">
+- [Serve UNet](https://ecosystem.supervise.ly/apps/supervisely-ecosystem/unet/supervisely/serve)  
+   <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/unet.png" width="350px"/>
+
 # How to Run
 
 1. Launch Serve APP, designed for Videos Projects
