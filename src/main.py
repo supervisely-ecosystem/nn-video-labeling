@@ -59,12 +59,15 @@ def apply_button_click(request: Request):
 
 @server.post("/jobs.info")
 def wrapper(request: Request):
+    print("jobs.info was called")
     event_api = request.state.api
     context = request.state.context
     me = event_api.user.get_my_info()
     if not me:
+        sly.logger.warning("Can't get annotator user info.")
         return
     if me.login == context.get("labelerLogin"):
+        sly.logger.info(f"Labeler {me.login} is annotating the job.")
         g.is_my_labeling_job = True
         job_meta = context.get(ApiField.META, {})
         dynamic_classes = job_meta.get("dynamicClasses", False)
