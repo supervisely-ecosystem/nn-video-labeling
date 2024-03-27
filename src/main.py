@@ -1,10 +1,11 @@
 import supervisely as sly
 import supervisely.app.development as sly_app_development
 from fastapi import Request
+from supervisely.api.module_api import ApiField
 from supervisely.app.widgets import Button, Container
 
 import src.globals as g
-from src.ui import apply_button, apply_button_clicked, ui_content
+from src.ui import apply_button, apply_button_clicked, error_text, ui_content
 
 layout = Container(widgets=[ui_content])
 app = sly.Application(layout=layout)
@@ -54,3 +55,26 @@ def apply_button_click(request: Request):
         if frame is not None:
             g.frame = frame
             apply_button_clicked()
+
+
+@server.post("/jobs.info")
+def wrapper(request: Request):
+    event_api = request.state.api
+    context = request.state.context
+    me = event_api.user.get_my_info()
+    if not me:
+        return
+    if me.login == context.get("labelerLogin"):
+        g.is_my_labeling_job = True
+        job_meta = context.get(ApiField.META, {})
+        dynamic_classes = job_meta.get("dynamicClasses", False)
+        dynamic_tags = job_meta.get("dynamicTags", False)
+        g.is_dynamic_classes_tags = dynamic_classes or dynamic_tags
+        if not g.is_dynamic_classes_tags:
+            sly.logger.warning("Dynamic classes/tags are disabled. Enable it in the job settings.")
+            error_text.text = "Dynamic classes/tags are disabled. Enable it in the job settings."
+            error_text.show()
+        else:
+            error_text.hide()
+            g.allowed_classes = [c.name for c in job_meta.get(ApiField.CLASSES, [])]
+            g.allowed_tags = [t.name for t in job_meta.get(ApiField.TAGS, [])]
