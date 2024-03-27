@@ -95,10 +95,7 @@ def inference():
         )
         if project_meta != res_project_meta:
             project_meta = res_project_meta
-            if g.is_my_labeling_job:
-                g.spawn_api.project.update_meta(g.project_id, project_meta.to_json())
-            else:
-                g.api.project.update_meta(g.project_id, project_meta.to_json())
+            g.spawn_api.project.update_meta(g.project_id, project_meta.to_json())
         g.api.project.pull_meta_ids(g.project_id, project_meta)
         g.project_metas[g.project_id] = project_meta
 

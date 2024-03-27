@@ -176,10 +176,7 @@ def apply_button_clicked():
             exc_info=True,
         )
     g.session.set_inference_settings(inf_settings)
-    if g.is_my_labeling_job:
-        g.spawn_api.vid_ann_tool.disable_job_controls(g.session_id)
-    else:
-        g.api.vid_ann_tool.disable_job_controls(g.session_id)
+    g.spawn_api.vid_ann_tool.disable_job_controls(g.session_id)
     try:
         f.inference()
         print("Inference done.")
@@ -187,9 +184,6 @@ def apply_button_clicked():
         sly.logger.warning("Model Inference failed", exc_info=True)
         error_text.text = f"Model Inference failed: {repr(e)}"
         error_text.show()
-    if g.is_my_labeling_job:
-        g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
-    else:
-        g.api.vid_ann_tool.enable_job_controls(g.session_id)
+    g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
     disconnect_button.enable()
     apply_button.loading = False
