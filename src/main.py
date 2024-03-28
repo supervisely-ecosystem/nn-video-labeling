@@ -5,14 +5,7 @@ from supervisely.api.module_api import ApiField
 from supervisely.app.widgets import Button, Container
 
 import src.globals as g
-from src.ui import (
-    apply_button,
-    apply_button_clicked,
-    connect_button,
-    connect_button_clicked,
-    error_text,
-    ui_content,
-)
+from src.ui import apply_button, apply_button_clicked, error_text, ui_content
 
 layout = Container(widgets=[ui_content])
 app = sly.Application(layout=layout)
@@ -47,29 +40,37 @@ apply_button._click_handled = True
 # * reimplementing the click event of the apply button to get the frame index from the context
 @server.post(apply_button.get_route_path(Button.Routes.CLICK))
 def apply_button_click(request: Request):
+    error_text.hide()
     state = request.get("state")
     if state:
         context = state.get("context")
         job_id = context.get("jobId")
-        job_id = 981  # TODO: REMOVE THIS
         g.is_my_labeling_job = False
-        if job_id != g.job_id:
+        if job_id is None:
+            g.job_id = None
+            g.is_my_labeling_job = False
+        elif g.job_id != job_id:
             me = g.api.user.get_my_info()
             lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
             if not me:
                 sly.logger.warning("Can't get annotator user info.")
+                g.job_id = None
             elif me.id == lableing_job.assigned_to_id:
-                sly.logger.info(f"Labeler {me.login} is annotating the job.")
                 g.is_my_labeling_job = True
                 g.allowed_classes = lableing_job.classes_to_label
                 g.allowed_tags = lableing_job.tags_to_label
                 g.job_id = job_id
-                error_text.set("Labeling job detected. Some classes and tags can be restricted.", status="info")
+                error_text.set(
+                    "Labeling job detected. Some classes and tags can be restricted.", status="info"
+                )
                 error_text.show()
-        if not g.is_my_labeling_job:
-            g.job_id = None
-            error_text.set("", status="warning")
-            error_text.hide()
+            else:
+                g.job_id = None
+                g.is_my_labeling_job = False
+                error_text.set("", status="warning")
+                error_text.hide()
+        else:
+            g.is_my_labeling_job = True
 
         frame = context.get("frame")
         g.project_id = context.get("projectId", g.project_id)
@@ -83,31 +84,3 @@ def apply_button_click(request: Request):
         if frame is not None:
             g.frame = frame
             apply_button_clicked()
-
-
-connect_button._click_handled = True
-
-
-# * reimplementing the click event of the connect button to get job id from the context
-@server.post(connect_button.get_route_path(Button.Routes.CLICK))
-def connect_button_click(request: Request):
-    # state = request.get("state")
-    # if state:
-    #     context = state.get("context")
-    #     job_id = context.get("jobId")
-    #     job_id = 981  # TODO: REMOVE THIS
-    #     if job_id != g.job_id:
-    #         me = g.api.user.get_my_info()
-    #         lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
-    #         if not me:
-    #             sly.logger.warning("Can't get annotator user info.")
-    #         elif me.id == lableing_job.assigned_to_id:
-    #             sly.logger.info(f"Labeler {me.login} is annotating the job.")
-    #             g.is_my_labeling_job = True
-    #             g.allowed_classes = lableing_job.classes_to_label
-    #             g.allowed_tags = lableing_job.tags_to_label
-    #             g.job_id = job_id
-    #     else:
-    #         g.is_my_labeling_job = False
-    #         g.job_id = None
-    connect_button_clicked()

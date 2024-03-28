@@ -73,7 +73,7 @@ tabs.hide()
 ui_content = w.Container([connect_field, error_text, tabs])
 
 
-# @connect_button.click
+@connect_button.click
 def connect_button_clicked():
     """Connects to the selected model session and changes the UI state."""
 
@@ -144,7 +144,6 @@ def disconnect_button_click():
 def apply_button_clicked():
     """Applies the model to the selected image."""
 
-    error_text.hide()
     apply_button.loading = True
     disconnect_button.disable()
     selected_classes = select_classes.get_selected_classes()
@@ -163,6 +162,15 @@ def apply_button_clicked():
         suffix_input.set_value(suffix)
         suffix_checkbox.check() if use_suffix else suffix_checkbox.uncheck()
 
+    if g.is_my_labeling_job:
+        checked_classes = [obj for obj in selected_classes if obj.name in g.allowed_classes]
+        checked_tags = [tag for tag in selected_tags if tag.name in g.allowed_tags]
+        if len(checked_classes) != len(selected_classes):
+            selected_classes = checked_classes
+            select_classes.select([obj_class.name for obj_class in selected_classes])
+        if len(checked_tags) != len(selected_tags):
+            selected_tags = checked_tags
+            select_tags.select([tag.name for tag in selected_tags])
     g.selected_classes = selected_classes
     g.selected_tags = selected_tags
     g.suffix = suffix
