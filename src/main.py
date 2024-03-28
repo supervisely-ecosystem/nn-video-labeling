@@ -10,6 +10,7 @@ from src.ui import (
     apply_button_clicked,
     connect_button,
     connect_button_clicked,
+    error_text,
     ui_content,
 )
 
@@ -49,8 +50,9 @@ def apply_button_click(request: Request):
     state = request.get("state")
     if state:
         context = state.get("context")
+        job_id = context.get("jobId")
         job_id = 981  # TODO: REMOVE THIS
-        # job_id = context.get("jobId")
+        g.is_my_labeling_job = False
         if job_id != g.job_id:
             me = g.api.user.get_my_info()
             lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
@@ -62,9 +64,11 @@ def apply_button_click(request: Request):
                 g.allowed_classes = lableing_job.classes_to_label
                 g.allowed_tags = lableing_job.tags_to_label
                 g.job_id = job_id
-        else:
-            g.is_my_labeling_job = False
+                error_text.set("Labeling job detected. Some classes and tags can be restricted.", status="info")
+        if not g.is_my_labeling_job:
             g.job_id = None
+            error_text.set("", status="error")
+
         frame = context.get("frame")
         g.project_id = context.get("projectId", g.project_id)
         g.video_id = context.get("entityId", g.video_id)
@@ -85,23 +89,23 @@ connect_button._click_handled = True
 # * reimplementing the click event of the connect button to get job id from the context
 @server.post(connect_button.get_route_path(Button.Routes.CLICK))
 def connect_button_click(request: Request):
-    state = request.get("state")
-    if state:
-        context = state.get("context")
-        job_id = context.get("jobId")
-        job_id = 981  # TODO: REMOVE THIS
-        if job_id != g.job_id:
-            me = g.api.user.get_my_info()
-            lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
-            if not me:
-                sly.logger.warning("Can't get annotator user info.")
-            elif me.id == lableing_job.assigned_to_id:
-                sly.logger.info(f"Labeler {me.login} is annotating the job.")
-                g.is_my_labeling_job = True
-                g.allowed_classes = lableing_job.classes_to_label
-                g.allowed_tags = lableing_job.tags_to_label
-                g.job_id = job_id
-        else:
-            g.is_my_labeling_job = False
-            g.job_id = None
+    # state = request.get("state")
+    # if state:
+    #     context = state.get("context")
+    #     job_id = context.get("jobId")
+    #     job_id = 981  # TODO: REMOVE THIS
+    #     if job_id != g.job_id:
+    #         me = g.api.user.get_my_info()
+    #         lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
+    #         if not me:
+    #             sly.logger.warning("Can't get annotator user info.")
+    #         elif me.id == lableing_job.assigned_to_id:
+    #             sly.logger.info(f"Labeler {me.login} is annotating the job.")
+    #             g.is_my_labeling_job = True
+    #             g.allowed_classes = lableing_job.classes_to_label
+    #             g.allowed_tags = lableing_job.tags_to_label
+    #             g.job_id = job_id
+    #     else:
+    #         g.is_my_labeling_job = False
+    #         g.job_id = None
     connect_button_clicked()
