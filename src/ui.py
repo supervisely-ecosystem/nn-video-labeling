@@ -25,10 +25,7 @@ icon = w.Field.Icon(
 
 connect_field = w.Field(
     content=w.Container(
-        [model_box, buttons_box],
-        direction="horizontal",
-        style="margin-top: 10px",
-        overflow=None
+        [model_box, buttons_box], direction="horizontal", style="margin-top: 10px", overflow=None
     ),
     title="Connect to running model",
     description="Define session (task id) with deployed model and connect to it.",
@@ -42,8 +39,17 @@ error_text.hide()
 
 # MODEL INFO
 model_info = w.ModelInfo()
+labeling_job_info = w.Text(
+    "Labeling job detected. Some classes and tags can be restricted.", "warning"
+)
+labeling_job_info.hide()
+classes_info_text = w.Text("List of classes in the model:", "text")
 select_classes = w.ClassesListSelector(multiple=True)
+classes_info = w.Container([labeling_job_info, classes_info_text, select_classes])
+
+tags_info_text = w.Text("List of tags in the model:", "text")
 select_tags = w.TagsListSelector(multiple=True)
+tags_info = w.Container([labeling_job_info, tags_info_text, select_tags])
 
 # INFERENCE SETTINGS
 suffix_input = w.Input("model", placeholder="Enter suffix")
@@ -187,3 +193,11 @@ def apply_button_clicked():
     g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
     disconnect_button.enable()
     apply_button.loading = False
+
+
+@tabs.click
+def update_info_text(val):
+    if g.is_my_labeling_job:
+        labeling_job_info.show()
+    else:
+        labeling_job_info.hide()
