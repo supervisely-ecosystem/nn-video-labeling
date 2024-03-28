@@ -71,8 +71,8 @@ tabs.hide()
 ui_content = w.Container([connect_field, error_text, tabs])
 
 
-@connect_button.click
-def connect_button_click():
+# @connect_button.click
+def connect_button_clicked():
     """Connects to the selected model session and changes the UI state."""
 
     connect_button.loading = True
@@ -155,7 +155,7 @@ def apply_button_clicked():
     if g.task_type != new_session_info.get("task type"):
         error_text.text = "Model task type has been changed. Reconnecting..."
         error_text.show()
-        connect_button_click()
+        connect_button_clicked()
         select_classes.select([obj_class.name for obj_class in selected_classes])
         select_tags.select([tag.name for tag in selected_tags])
         suffix_input.set_value(suffix)

@@ -5,7 +5,13 @@ from supervisely.api.module_api import ApiField
 from supervisely.app.widgets import Button, Container
 
 import src.globals as g
-from src.ui import apply_button, apply_button_clicked, error_text, ui_content
+from src.ui import (
+    apply_button,
+    apply_button_clicked,
+    connect_button,
+    connect_button_clicked,
+    ui_content,
+)
 
 layout = Container(widgets=[ui_content])
 app = sly.Application(layout=layout)
@@ -43,6 +49,22 @@ def apply_button_click(request: Request):
     state = request.get("state")
     if state:
         context = state.get("context")
+        job_id = 981  # TODO: REMOVE THIS
+        # job_id = context.get("jobId")
+        if job_id != g.job_id:
+            me = g.api.user.get_my_info()
+            lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
+            if not me:
+                sly.logger.warning("Can't get annotator user info.")
+            elif me.id == lableing_job.assigned_to_id:
+                sly.logger.info(f"Labeler {me.login} is annotating the job.")
+                g.is_my_labeling_job = True
+                g.allowed_classes = lableing_job.classes_to_label
+                g.allowed_tags = lableing_job.tags_to_label
+                g.job_id = job_id
+        else:
+            g.is_my_labeling_job = False
+            g.job_id = None
         frame = context.get("frame")
         g.project_id = context.get("projectId", g.project_id)
         g.video_id = context.get("entityId", g.video_id)
@@ -57,27 +79,29 @@ def apply_button_click(request: Request):
             apply_button_clicked()
 
 
-@server.post("/jobs.info")
-def wrapper(request: Request):
-    print("jobs.info was called")
-    event_api = request.state.api
-    context = request.state.context
-    me = event_api.user.get_my_info()
-    if not me:
-        sly.logger.warning("Can't get annotator user info.")
-        return
-    if me.login == context.get("labelerLogin"):
-        sly.logger.info(f"Labeler {me.login} is annotating the job.")
-        g.is_my_labeling_job = True
-        job_meta = context.get(ApiField.META, {})
-        dynamic_classes = job_meta.get("dynamicClasses", False)
-        dynamic_tags = job_meta.get("dynamicTags", False)
-        g.is_dynamic_classes_tags = dynamic_classes or dynamic_tags
-        if not g.is_dynamic_classes_tags:
-            sly.logger.warning("Dynamic classes/tags are disabled. Enable it in the job settings.")
-            error_text.text = "Dynamic classes/tags are disabled. Enable it in the job settings."
-            error_text.show()
+connect_button._click_handled = True
+
+
+# * reimplementing the click event of the connect button to get job id from the context
+@server.post(connect_button.get_route_path(Button.Routes.CLICK))
+def connect_button_click(request: Request):
+    state = request.get("state")
+    if state:
+        context = state.get("context")
+        job_id = context.get("jobId")
+        job_id = 981  # TODO: REMOVE THIS
+        if job_id != g.job_id:
+            me = g.api.user.get_my_info()
+            lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
+            if not me:
+                sly.logger.warning("Can't get annotator user info.")
+            elif me.id == lableing_job.assigned_to_id:
+                sly.logger.info(f"Labeler {me.login} is annotating the job.")
+                g.is_my_labeling_job = True
+                g.allowed_classes = lableing_job.classes_to_label
+                g.allowed_tags = lableing_job.tags_to_label
+                g.job_id = job_id
         else:
-            error_text.hide()
-            g.allowed_classes = [c.name for c in job_meta.get(ApiField.CLASSES, [])]
-            g.allowed_tags = [t.name for t in job_meta.get(ApiField.TAGS, [])]
+            g.is_my_labeling_job = False
+            g.job_id = None
+    connect_button_clicked()

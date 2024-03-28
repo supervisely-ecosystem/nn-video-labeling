@@ -10,11 +10,12 @@ if sly.is_development():
 # Initializing global variables.
 spawn_api_token = sly.env.spawn_api_token()
 api = sly.Api.from_env()
+# spawn_api_token = api.token
 spawn_api = sly.Api(server_address=api.server_address, token=spawn_api_token)
 team_id = sly.env.team_id()
 
 is_my_labeling_job = False
-is_dynamic_classes_tags = True
+job_id = None
 allowed_classes = None
 allowed_tags = None
 
