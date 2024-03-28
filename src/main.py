@@ -1,10 +1,11 @@
 import supervisely as sly
 import supervisely.app.development as sly_app_development
 from fastapi import Request
+from supervisely.api.module_api import ApiField
 from supervisely.app.widgets import Button, Container
 
 import src.globals as g
-from src.ui import apply_button, apply_button_clicked, ui_content
+from src.ui import apply_button, apply_button_clicked, error_text, ui_content
 
 layout = Container(widgets=[ui_content])
 app = sly.Application(layout=layout)
@@ -42,6 +43,35 @@ def apply_button_click(request: Request):
     state = request.get("state")
     if state:
         context = state.get("context")
+        job_id = context.get("jobId")
+        g.is_my_labeling_job = False
+        if job_id is None:
+            error_text.hide()
+            g.job_id = None
+            g.is_my_labeling_job = False
+        elif g.job_id != job_id:
+            me = g.api.user.get_my_info()
+            lableing_job = g.spawn_api.labeling_job.get_info_by_id(job_id)
+            if not me:
+                sly.logger.warning("Can't get annotator user info.")
+                g.job_id = None
+            elif me.id == lableing_job.assigned_to_id:
+                g.is_my_labeling_job = True
+                g.allowed_classes = lableing_job.classes_to_label
+                g.allowed_tags = lableing_job.tags_to_label
+                g.job_id = job_id
+                error_text.set(
+                    "Labeling job detected. Some classes and tags can be restricted.", status="info"
+                )
+                error_text.show()
+            else:
+                g.job_id = None
+                g.is_my_labeling_job = False
+                error_text.set("", status="warning")
+                error_text.hide()
+        else:
+            g.is_my_labeling_job = True
+
         frame = context.get("frame")
         g.project_id = context.get("projectId", g.project_id)
         g.video_id = context.get("entityId", g.video_id)

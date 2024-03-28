@@ -25,10 +25,7 @@ icon = w.Field.Icon(
 
 connect_field = w.Field(
     content=w.Container(
-        [model_box, buttons_box],
-        direction="horizontal",
-        style="margin-top: 10px",
-        overflow=None
+        [model_box, buttons_box], direction="horizontal", style="margin-top: 10px", overflow=None
     ),
     title="Connect to running model",
     description="Define session (task id) with deployed model and connect to it.",
@@ -42,8 +39,13 @@ error_text.hide()
 
 # MODEL INFO
 model_info = w.ModelInfo()
+classes_info_text = w.Text("List of classes from the model:", "text")
 select_classes = w.ClassesListSelector(multiple=True)
+classes_info = w.Container([classes_info_text, select_classes])
+
+tags_info_text = w.Text("List of tags from the model:", "text")
 select_tags = w.TagsListSelector(multiple=True)
+tags_info = w.Container([tags_info_text, select_tags])
 
 # INFERENCE SETTINGS
 suffix_input = w.Input("model", placeholder="Enter suffix")
@@ -60,8 +62,8 @@ tabs = w.Tabs(
     labels=["Info", "Classes", "Tags", "Inference"],
     contents=[
         model_info,
-        select_classes,
-        select_tags,
+        classes_info,
+        tags_info,
         settings_container,
     ],
     type="card",
@@ -72,7 +74,7 @@ ui_content = w.Container([connect_field, error_text, tabs])
 
 
 @connect_button.click
-def connect_button_click():
+def connect_button_clicked():
     """Connects to the selected model session and changes the UI state."""
 
     connect_button.loading = True
@@ -142,7 +144,6 @@ def disconnect_button_click():
 def apply_button_clicked():
     """Applies the model to the selected image."""
 
-    error_text.hide()
     apply_button.loading = True
     disconnect_button.disable()
     selected_classes = select_classes.get_selected_classes()
@@ -155,12 +156,21 @@ def apply_button_clicked():
     if g.task_type != new_session_info.get("task type"):
         error_text.text = "Model task type has been changed. Reconnecting..."
         error_text.show()
-        connect_button_click()
+        connect_button_clicked()
         select_classes.select([obj_class.name for obj_class in selected_classes])
         select_tags.select([tag.name for tag in selected_tags])
         suffix_input.set_value(suffix)
         suffix_checkbox.check() if use_suffix else suffix_checkbox.uncheck()
 
+    if g.is_my_labeling_job:
+        checked_classes = [obj for obj in selected_classes if obj.name in g.allowed_classes]
+        checked_tags = [tag for tag in selected_tags if tag.name in g.allowed_tags]
+        if len(checked_classes) != len(selected_classes):
+            selected_classes = checked_classes
+            select_classes.select([obj_class.name for obj_class in selected_classes])
+        if len(checked_tags) != len(selected_tags):
+            selected_tags = checked_tags
+            select_tags.select([tag.name for tag in selected_tags])
     g.selected_classes = selected_classes
     g.selected_tags = selected_tags
     g.suffix = suffix
@@ -176,6 +186,7 @@ def apply_button_clicked():
             exc_info=True,
         )
     g.session.set_inference_settings(inf_settings)
+    g.spawn_api.vid_ann_tool.disable_job_controls(g.session_id)
     try:
         f.inference()
         print("Inference done.")
@@ -183,5 +194,6 @@ def apply_button_clicked():
         sly.logger.warning("Model Inference failed", exc_info=True)
         error_text.text = f"Model Inference failed: {repr(e)}"
         error_text.show()
+    g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
     disconnect_button.enable()
     apply_button.loading = False

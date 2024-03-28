@@ -57,14 +57,26 @@ def get_inference_settings(api: sly.Api, model_session_id: int) -> str:
 
 def load_classes(model_meta) -> sly.ObjClassCollection:
     """Fills the widget with the classes from the model metadata."""
-    obj_classes = model_meta.obj_classes
+    if g.is_my_labeling_job:
+        obj_classes = []
+        for obj_class in model_meta.obj_classes:
+            if obj_class.name in g.allowed_classes:
+                obj_classes.append(obj_class)
+    else:
+        obj_classes = model_meta.obj_classes
     sly.logger.info(f"{len(obj_classes)} classes were loaded.")
     return obj_classes
 
 
 def load_tags(model_meta) -> sly.TagMetaCollection:
     """Fills the widget with the tags from the model metadata."""
-    obj_tags = model_meta.tag_metas
+    if g.is_my_labeling_job:
+        obj_tags = []
+        for tag_meta in model_meta.tag_metas:
+            if tag_meta.name in g.allowed_tags:
+                obj_tags.append(tag_meta)
+    else:
+        obj_tags = model_meta.tag_metas
     sly.logger.info(f"{len(obj_tags)} tags were loaded.")
     return obj_tags
 
@@ -73,7 +85,6 @@ def inference():
     """Applies the model to the selected frame."""
     project_meta = g.project_metas[g.project_id]
 
-    g.api.vid_ann_tool.disable_job_controls(g.session_id)
     predictions_list = g.session.inference_video_id(
         g.video_id, start_frame_index=g.frame, frames_count=1, frames_direction="forward"
     )
@@ -84,7 +95,7 @@ def inference():
         )
         if project_meta != res_project_meta:
             project_meta = res_project_meta
-            g.api.project.update_meta(g.project_id, project_meta.to_json())
+            g.spawn_api.project.update_meta(g.project_id, project_meta.to_json())
         g.api.project.pull_meta_ids(g.project_id, project_meta)
         g.project_metas[g.project_id] = project_meta
 
@@ -104,8 +115,6 @@ def inference():
             for tag in label.tags:
                 tag_meta = project_meta.get_tag_meta(tag.meta.name)
                 g.api.advanced.add_tag_to_object(tag_meta.sly_id, fig_id, tag.value)
-
-    g.api.vid_ann_tool.enable_job_controls(g.session_id)
 
 
 def postprocess(
@@ -266,6 +275,13 @@ def find_item(
                             return None, res_name
                 return existing_item, None
             else:
+                if type(existing_item) == sly.ObjClass:
+                    if existing_item.name == res_name:
+                        if existing_item.geometry_type != item.geometry_type:
+                            sly.logger.warning(
+                                f"Class {res_name} with different geometry type already exists in the project. "
+                                "Suffix will be added to the class name."
+                            )
                 res_name = generate_res_name(item, suffix, index)
                 index += 1
 
