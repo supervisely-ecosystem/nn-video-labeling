@@ -275,6 +275,13 @@ def find_item(
                             return None, res_name
                 return existing_item, None
             else:
+                if type(existing_item) == sly.ObjClass:
+                    if existing_item.name == res_name:
+                        if existing_item.geometry_type != item.geometry_type:
+                            sly.logger.warning(
+                                f"Class {res_name} with different geometry type already exists in the project. "
+                                "Suffix will be added to the class name."
+                            )
                 res_name = generate_res_name(item, suffix, index)
                 index += 1
 
