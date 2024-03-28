@@ -189,11 +189,3 @@ def apply_button_clicked():
     g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
     disconnect_button.enable()
     apply_button.loading = False
-
-
-@tabs.click
-def update_info_text(val):
-    if g.is_my_labeling_job:
-        labeling_job_info.show()
-    else:
-        labeling_job_info.hide()
