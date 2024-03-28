@@ -40,13 +40,13 @@ apply_button._click_handled = True
 # * reimplementing the click event of the apply button to get the frame index from the context
 @server.post(apply_button.get_route_path(Button.Routes.CLICK))
 def apply_button_click(request: Request):
-    error_text.hide()
     state = request.get("state")
     if state:
         context = state.get("context")
         job_id = context.get("jobId")
         g.is_my_labeling_job = False
         if job_id is None:
+            error_text.hide()
             g.job_id = None
             g.is_my_labeling_job = False
         elif g.job_id != job_id:
