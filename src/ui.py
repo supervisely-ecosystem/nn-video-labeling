@@ -39,17 +39,13 @@ error_text.hide()
 
 # MODEL INFO
 model_info = w.ModelInfo()
-labeling_job_info = w.Text(
-    "Labeling job detected. Some classes and tags can be restricted.", "warning"
-)
-labeling_job_info.hide()
-classes_info_text = w.Text("List of classes in the model:", "text")
+classes_info_text = w.Text("List of classes from the model:", "text")
 select_classes = w.ClassesListSelector(multiple=True)
-classes_info = w.Container([labeling_job_info, classes_info_text, select_classes])
+classes_info = w.Container([classes_info_text, select_classes])
 
-tags_info_text = w.Text("List of tags in the model:", "text")
+tags_info_text = w.Text("List of tags from the model:", "text")
 select_tags = w.TagsListSelector(multiple=True)
-tags_info = w.Container([labeling_job_info, tags_info_text, select_tags])
+tags_info = w.Container([tags_info_text, select_tags])
 
 # INFERENCE SETTINGS
 suffix_input = w.Input("model", placeholder="Enter suffix")
@@ -66,8 +62,8 @@ tabs = w.Tabs(
     labels=["Info", "Classes", "Tags", "Inference"],
     contents=[
         model_info,
-        select_classes,
-        select_tags,
+        classes_info,
+        tags_info,
         settings_container,
     ],
     type="card",

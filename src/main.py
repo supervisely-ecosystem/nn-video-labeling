@@ -65,9 +65,11 @@ def apply_button_click(request: Request):
                 g.allowed_tags = lableing_job.tags_to_label
                 g.job_id = job_id
                 error_text.set("Labeling job detected. Some classes and tags can be restricted.", status="info")
+                error_text.show()
         if not g.is_my_labeling_job:
             g.job_id = None
-            error_text.set("", status="error")
+            error_text.set("", status="warning")
+            error_text.hide()
 
         frame = context.get("frame")
         g.project_id = context.get("projectId", g.project_id)
