@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "name": "Apply NN to video frames",
   "description": "Apply NN models to video frames",
-  "docker_image": "supervisely/labeling:6.73.45",
+  "docker_image": "supervisely/labeling:6.73.97",
   "instance_version": "6.8.88",
   "categories": [
     "neural network",
