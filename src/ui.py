@@ -81,11 +81,13 @@ def connect_button_clicked():
     """Connects to the selected model session and changes the UI state."""
     error_container.hide()
     error_button.hide()
+    connect_button.loading = True
 
     g.model_session_id = select_session.get_selected_id()
     if g.model_session_id is None:
         error_text.text = "No model was selected, please select a model and try again."
         error_container.show()
+        connect_button.loading = False
         return
 
     app_url = f"{g.api.server_address}/apps/sessions/{g.model_session_id}"
@@ -101,6 +103,7 @@ def connect_button_clicked():
         )
         error_button.show()
         error_container.show()
+        connect_button.loading = False
         return
 
     if not session_info:
@@ -109,6 +112,7 @@ def connect_button_clicked():
         )
         error_button.show()
         error_container.show()
+        connect_button.loading = False
         return
 
     model_info.set_model_info(g.model_session_id, session_info)
@@ -133,6 +137,7 @@ def connect_button_clicked():
     tabs.show()
     disconnect_button.show()
     apply_button.show()
+    connect_button.loading = False
 
 
 @disconnect_button.click
@@ -160,6 +165,7 @@ def disconnect_button_click():
 def apply_button_clicked():
     """Applies the model to the selected image."""
 
+    apply_button.loading = True
     error_button.hide()
     error_container.hide()
     disconnect_button.disable()
@@ -168,54 +174,63 @@ def apply_button_clicked():
     suffix = suffix_input.get_value()
     use_suffix = suffix_checkbox.is_checked()
 
-    new_session = sly.nn.inference.Session(g.api, task_id=g.model_session_id)
-    new_session_info = new_session.get_session_info()
-    if g.task_type != new_session_info.get("task type"):
-        error_text.text = "Model task type has been changed. Reconnecting..."
-        error_container.show()
-        connect_button_clicked()
-        select_classes.select([obj_class.name for obj_class in selected_classes])
-        select_tags.select([tag.name for tag in selected_tags])
-        suffix_input.set_value(suffix)
-        suffix_checkbox.check() if use_suffix else suffix_checkbox.uncheck()
+    app_url = f"{g.api.server_address}/apps/sessions/{g.model_session_id}"
+    error_button.text = "OPEN SERVING APP"
+    error_button.link = app_url
 
-    if g.is_my_labeling_job:
-        checked_classes = [obj for obj in selected_classes if obj.name in g.allowed_classes]
-        checked_tags = [tag for tag in selected_tags if tag.name in g.allowed_tags]
-        if len(checked_classes) != len(selected_classes):
-            selected_classes = checked_classes
+    try:
+        new_session = sly.nn.inference.Session(g.api, task_id=g.model_session_id)
+        new_session_info = new_session.get_session_info()
+        if g.task_type != new_session_info.get("task type"):
+            error_text.text = "Model task type has been changed. Reconnecting..."
+            error_container.show()
+            connect_button_clicked()
             select_classes.select([obj_class.name for obj_class in selected_classes])
-        if len(checked_tags) != len(selected_tags):
-            selected_tags = checked_tags
             select_tags.select([tag.name for tag in selected_tags])
-    g.selected_classes = selected_classes
-    g.selected_tags = selected_tags
-    g.suffix = suffix
-    g.use_suffix = use_suffix
+            suffix_input.set_value(suffix)
+            suffix_checkbox.check() if use_suffix else suffix_checkbox.uncheck()
 
-    try:
-        inf_settings = yaml.safe_load(inference_settings.get_value())
-        print(f"Inference Settings: {inf_settings}")
+        if g.is_my_labeling_job:
+            checked_classes = [obj for obj in selected_classes if obj.name in g.allowed_classes]
+            checked_tags = [tag for tag in selected_tags if tag.name in g.allowed_tags]
+            if len(checked_classes) != len(selected_classes):
+                selected_classes = checked_classes
+                select_classes.select([obj_class.name for obj_class in selected_classes])
+            if len(checked_tags) != len(selected_tags):
+                selected_tags = checked_tags
+                select_tags.select([tag.name for tag in selected_tags])
+        g.selected_classes = selected_classes
+        g.selected_tags = selected_tags
+        g.suffix = suffix
+        g.use_suffix = use_suffix
+
+        try:
+            inf_settings = yaml.safe_load(inference_settings.get_value())
+            print(f"Inference Settings: {inf_settings}")
+        except Exception as e:
+            inf_settings = yaml.safe_load(g.inference_settings)
+            sly.logger.warning(
+                f"Model Inference launched without additional settings. \n" f"Reason: {e}",
+                exc_info=True,
+            )
+        g.session.set_inference_settings(inf_settings)
+        g.spawn_api.vid_ann_tool.disable_job_controls(g.session_id)
+        try:
+            f.inference()
+            print("Inference done.")
+        except Exception as e:
+            sly.logger.warning("Model Inference failed", exc_info=True)
+            error_text.text = (
+                f"Model Inference failed. Check the serving app logs for more details. {repr(e)}"
+            )
+            error_button.show()
+            error_container.show()
     except Exception as e:
-        inf_settings = yaml.safe_load(g.inference_settings)
-        sly.logger.warning(
-            f"Model Inference launched without additional settings. \n" f"Reason: {e}",
-            exc_info=True,
-        )
-    g.session.set_inference_settings(inf_settings)
-    g.spawn_api.vid_ann_tool.disable_job_controls(g.session_id)
-    try:
-        f.inference()
-        print("Inference done.")
-    except Exception as e:
-        sly.logger.warning("Model Inference failed", exc_info=True)
-        error_text.text = f"Model Inference failed. Check the serving app logs for more details. {repr(e)}"
-
-        app_url = f"{g.api.server_address}/apps/sessions/{g.model_session_id}"
-        error_button.text = "OPEN SERVING APP"
-        error_button.link = app_url
-
+        sly.logger.warning("Couldn't connect to the model", exc_info=True)
+        error_text.text = f"Couldn't connect to the model. Make sure that model is deployed and try again. {repr(e)}"
         error_button.show()
         error_container.show()
-    g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
-    disconnect_button.enable()
+    finally:
+        apply_button.loading = False
+        disconnect_button.enable()
+        g.spawn_api.vid_ann_tool.enable_job_controls(g.session_id)
