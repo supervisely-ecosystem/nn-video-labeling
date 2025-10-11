@@ -32,25 +32,25 @@ The application supports the following models:
 
 ### Object Detection:
 
-- [Serve YOLOv8](../../../../../supervisely-ecosystem/yolov8/serve)  
+- [Serve YOLOv8](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/yolov8/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/yolov8/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/yoloV8.png" width="350px"/>
 - [Serve MMDetection 3.0](../../../../supervisely-ecosystem/serve-mmdetection-v3)  
   <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/serve-mmdetection-v3" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmDet3.png" width="350px"/>
 
 ### Instance Segmentation:
 
-- [Serve Detectron2](../../../../../../../supervisely-ecosystem/detectron2/supervisely/instance_segmentation/serve)  
+- [Serve Detectron2](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/detectron2/supervisely/instance_segmentation/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/detectron2/supervisely/instance_segmentation/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/detectron2.png" width="350px"/>
-- [Serve YOLOv8](../../../../../supervisely-ecosystem/yolov8/serve)  
+- [Serve YOLOv8](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/yolov8/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/yolov8/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/yoloV8.png" width="350px"/>
 - [Serve MMDetection 3.0](../../../../supervisely-ecosystem/serve-mmdetection-v3)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/serve-mmdetection-v3" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmDet3.png" width="350px"/>
 
 ### Semantic Segmentation:
 
-- [Serve MMSegmentation](../../../../../supervisely-ecosystem/mmsegmentation/serve)  
+- [Serve MMSegmentation](https://ecosystem.supervisely.com/apps/mmsegmentation/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/mmsegmentation/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/mmSeg.png" width="350px"/>
-- [Serve UNet](../../../../../../supervisely-ecosystem/unet/supervisely/serve)  
+- [Serve UNet](https://ecosystem.supervisely.com/apps/supervisely-ecosystem/unet/supervisely/serve)  
    <img data-key="sly-module-link" data-module-slug="supervisely-ecosystem/unet/supervisely/serve" src="https://github.com/supervisely-ecosystem/nn-video-labeling/releases/download/v0.0.1/unet.png" width="350px"/>
 
 # How to Run
