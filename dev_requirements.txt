@@ -1,2 +1,2 @@
-supervisely==6.73.98
+supervisely==6.73.564
 # git+https://github.com/supervisely/supervisely.git@test-sdk-branch
