@@ -4,7 +4,7 @@
   "name": "Apply NN to video frames",
   "description": "Apply NN models to video frames",
   "docker_image": "supervisely/labeling:6.73.564",
-  "instance_version": "6.8.88",
+  "instance_version": "6.15.60",
   "categories": [
     "neural network",
     "videos",
